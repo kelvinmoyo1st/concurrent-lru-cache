@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/cache")
 class CacheController {
 
-    private final LruCache<String, String> cache;
+    private final CacheService cacheService;
 
-    CacheController(LruCache<String, String> cache) {
-        this.cache = cache;
+    CacheController(CacheService cacheService) {
+        this.cacheService = cacheService;
     }
 
     @GetMapping("/{key}")
     ResponseEntity<String> get(@PathVariable String key) {
-        String value = cache.get(key);
+        String value = cacheService.get(key);
         if (value == null) {
             return ResponseEntity.notFound().build();
         }
@@ -24,7 +24,7 @@ class CacheController {
 
     @PutMapping("/{key}")
     ResponseEntity<Void> put(@PathVariable String key, @RequestBody String value) {
-        cache.put(key, value);
+        cacheService.put(key, value);
         return ResponseEntity.ok().build();
     }
 }
