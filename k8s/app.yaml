@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cache-app
+  template:
+    metadata:
+      labels:
+        app: cache-app
+    spec:
+      containers:
+        - name: cache-app
+          image: concurrent-lru-cache
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: postgres
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: cachedb
+            - name: DB_USER
+              value: cacheuser
+            - name: DB_PASSWORD
+              value: cachepass
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cache-app
+spec:
+  type: NodePort
+  selector:
+    app: cache-app
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
